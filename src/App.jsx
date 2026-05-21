@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { pay } from '@base-org/account';
 import { Flame, Share2, RotateCcw, Zap, Trophy, WalletCards, Skull, TrendingUp } from 'lucide-react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
@@ -84,6 +85,8 @@ const FLEX = [
   'LFG. Очко в копилку социальной доминации.',
 ];
 
+const PAYMENT_ADDRESS = import.meta.env.VITE_BASE_PAY_RECIPIENT || '';
+
 function shuffleDeck() {
   return [...CARDS].sort(() => Math.random() - 0.5);
 }
@@ -97,6 +100,7 @@ function App() {
   const [feedback, setFeedback] = useState('Свайпай или жми: APE, если веришь в сигнал. FADE, если пахнет сливом.');
   const [motion, setMotion] = useState('');
   const [dragX, setDragX] = useState(0);
+  const [paymentStatus, setPaymentStatus] = useState('idle');
   const [best, setBest] = useState(() => Number(localStorage.getItem('apeBest') || 0));
   const startX = useRef(null);
 
@@ -153,6 +157,26 @@ function App() {
     }
     await navigator.clipboard.writeText(text);
     setFeedback('Результат скопирован. Можно кидать в Telegram или X.');
+  }
+
+  async function sendTip(amount) {
+    if (!PAYMENT_ADDRESS) {
+      setFeedback('Монетизация не настроена: добавь VITE_BASE_PAY_RECIPIENT в Vercel Environment Variables.');
+      return;
+    }
+
+    try {
+      setPaymentStatus('pending');
+      const payment = await pay({
+        amount,
+        to: PAYMENT_ADDRESS,
+      });
+      setPaymentStatus('success');
+      setFeedback(`USDC tip отправлен. Payment id: ${payment.id || 'created'}.`);
+    } catch (error) {
+      setPaymentStatus('error');
+      setFeedback(error?.message ? `Платёж не прошёл: ${error.message}` : 'Платёж отменён или не прошёл.');
+    }
   }
 
   function onPointerDown(event) {
@@ -261,6 +285,15 @@ function App() {
         </button>
         <button className="ape-button" disabled={finished} onClick={() => resolve('ape')}>
           APE
+        </button>
+      </section>
+
+      <section className="payments" aria-label="USDC tips">
+        <button disabled={paymentStatus === 'pending'} onClick={() => sendTip('0.25')}>
+          Tip $0.25
+        </button>
+        <button disabled={paymentStatus === 'pending'} onClick={() => sendTip('1.00')}>
+          Tip $1
         </button>
       </section>
 

@@ -17,6 +17,18 @@ Open `http://127.0.0.1:5173`.
 npm run build
 ```
 
+## Monetization
+
+The app uses Base Pay for optional USDC tips.
+
+Create a Vercel environment variable before production deploy:
+
+```text
+VITE_BASE_PAY_RECIPIENT=0xYourBaseWalletAddress
+```
+
+Use a wallet address you control on Base. Without this variable, the tip buttons will not send payments.
+
 ## Add to Base App
 
 1. Deploy the app to a public HTTPS domain, for example Vercel.

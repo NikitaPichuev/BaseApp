@@ -224,6 +224,7 @@ h1 {
 }
 
 .decision-row,
+.payments,
 .result-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -231,6 +232,7 @@ h1 {
 }
 
 .decision-row button,
+.payments button,
 .result-actions button {
   min-height: 58px;
   border-radius: 8px;
@@ -245,6 +247,13 @@ h1 {
 .ape-button {
   color: #041225;
   background: #75f5d3;
+}
+
+.payments button {
+  min-height: 44px;
+  color: #dbe7ff;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 15px;
 }
 
 .result-panel {
